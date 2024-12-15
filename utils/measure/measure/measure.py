@@ -19,8 +19,10 @@ from inquirer.render import ConsoleRender
 from measure.config import MeasureConfig
 from measure.const import PROJECT_DIR, QUESTION_DUMMY_LOAD, QUESTION_GENERATE_MODEL_JSON, QUESTION_MEASURE_DEVICE, QUESTION_MODEL_NAME, MeasureType
 from measure.controller.light.errors import LightControllerError
+from measure.powermeter.const import QUESTION_POWERMETER_ENTITY_ID
 from measure.powermeter.errors import PowerMeterError
 from measure.powermeter.factory import PowerMeterFactory
+from measure.powermeter.hass import HassPowerMeter
 from measure.powermeter.powermeter import PowerMeter
 from measure.runner.average import AverageRunner
 from measure.runner.charging import ChargingRunner
@@ -271,6 +273,22 @@ class Measure:
 
         answers = inquirer.prompt(questions_to_ask, answers=predefined_answers, render=self.console_render)
         answers.update(predefined_answers)
+
+        # if either no dummy load is used or not with hass power meters, skip this
+        if not (answers.get(QUESTION_DUMMY_LOAD, False) and isinstance(self.power_meter, HassPowerMeter)):
+            pass
+        elif self.power_meter.autodetect_voltage_entity(answers.get(QUESTION_POWERMETER_ENTITY_ID, None)):
+            # Autodetection succeeded
+            pass
+        else:
+            # Ask voltage question if autodetection failed
+            voltage_question = self.power_meter.get_voltage_question()
+            if voltage_question:
+                voltage_answer = self.ask_questions(voltage_question)
+                answers.update(voltage_answer)
+            else:
+                _LOGGER.error("Voltage Meter question result was empty")
+                exit(1)
 
         _LOGGER.debug("Answers: %s", answers)
 

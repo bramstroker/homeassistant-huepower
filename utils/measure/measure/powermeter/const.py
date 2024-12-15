@@ -14,3 +14,4 @@ class PowerMeterType(str, Enum):
 
 
 QUESTION_POWERMETER_ENTITY_ID = "powermeter_entity_id"
+QUESTION_VOLTAGEMETER_ENTITY_ID = "voltagemeter_entity_id"

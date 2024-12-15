@@ -12,3 +12,7 @@ class ZeroReadingError(PowerMeterError):
 
 class ApiConnectionError(PowerMeterError):
     pass
+
+
+class UnsupportedFeatureError(PowerMeterError):
+    pass

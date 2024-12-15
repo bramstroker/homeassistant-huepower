@@ -1,5 +1,5 @@
 import os
-from enum import Enum
+from enum import Enum, StrEnum
 from pathlib import Path
 
 QUESTION_GENERATE_MODEL_JSON = "generate_model_json"
@@ -21,3 +21,13 @@ class MeasureType(str, Enum):
     RECORDER = "Recorder"
     AVERAGE = "Average"
     CHARGING = "Charging device"
+
+
+class Trend(StrEnum):
+    INCREASING = "increasing"
+    DECREASING = "decreasing"
+    STEADY = "steady"
+
+
+dummy_load_measurement_count = 20
+dummy_load_measurements_duration = 30
