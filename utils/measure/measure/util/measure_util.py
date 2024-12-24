@@ -149,7 +149,7 @@ class MeasureUtil:
             measurement: PowerMeasurementResult | None = None
 
             try:
-                self.power_meter.get_power(include_voltage=bool(self.dummy_load_value))
+                measurement = self.power_meter.get_power(include_voltage=bool(self.dummy_load_value))
 
                 updated_at = dt.fromtimestamp(measurement.updated).strftime(
                     "%d-%m-%Y, %H:%M:%S",
