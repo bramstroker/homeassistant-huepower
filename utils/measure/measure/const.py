@@ -31,3 +31,4 @@ class Trend(StrEnum):
 
 dummy_load_measurement_count = 20
 dummy_load_measurements_duration = 30
+RETRY_COUNT_LIMIT = 100

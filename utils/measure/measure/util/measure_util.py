@@ -9,7 +9,7 @@ from statistics import mean
 import numpy as np
 
 from measure.config import MeasureConfig
-from measure.const import PROJECT_DIR, Trend, dummy_load_measurement_count, dummy_load_measurements_duration
+from measure.const import PROJECT_DIR, RETRY_COUNT_LIMIT, Trend, dummy_load_measurement_count, dummy_load_measurements_duration
 from measure.powermeter.errors import (
     OutdatedMeasurementError,
     PowerMeterError,
@@ -186,6 +186,13 @@ class MeasureUtil:
             if error:
                 # Prevent endless recursion. Throw error when max retries is reached
                 if retry_count == self.config.max_retries:
+                    raise error
+                if retry_count >= RETRY_COUNT_LIMIT:
+                    _LOGGER.error(
+                        "Retry count exceeded %d. Configured max_retries value: %d. Aborting to prevent infinite loop.",
+                        RETRY_COUNT_LIMIT,
+                        self.config.max_retries,
+                    )
                     raise error
                 retry_count += 1
                 time.sleep(self.config.sleep_time)
