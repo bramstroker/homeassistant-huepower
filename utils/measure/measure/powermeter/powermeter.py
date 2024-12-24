@@ -27,4 +27,4 @@ class PowerMeter(ABC):
 class PowerMeasurementResult(NamedTuple):
     power: float
     updated: float
-    voltage: Optional[float] = None
+    voltage: Optional[float] = None  # noqa: F821
