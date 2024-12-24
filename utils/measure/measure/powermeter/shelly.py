@@ -131,11 +131,7 @@ class ShellyPowerMeter(PowerMeter):
         return int(gen)
 
     def has_voltage_support(self) -> bool:
-        if isinstance(self.api, ShellyApiGen1):
-            return False
-        if isinstance(self.api, ShellyApiGen2Plus):
-            return True
-        return False
+        return isinstance(self.api, ShellyApiGen2Plus)
 
     def process_answers(self, answers: dict[str, Any]) -> None:
         pass
