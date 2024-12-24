@@ -141,6 +141,11 @@ class MeasureUtil:
         retry_count: int = 0,
     ) -> float:
         """Get a measurement from the powermeter, take multiple samples and calculate the average"""
+
+        if self.config.max_retries is None:
+            _LOGGER.error("No max_retries value was configured. Setting the default of 5 to prevent infinite loop.")
+            self.config.max_retries = 5
+
         measurements = []
         # Take multiple samples to reduce noise
         for i in range(1, self.config.sample_count + 1):
