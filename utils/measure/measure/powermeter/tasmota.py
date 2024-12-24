@@ -16,7 +16,7 @@ class TasmotaPowerMeter(PowerMeter):
     def get_power(self, include_voltage: bool = False) -> PowerMeasurementResult:
         """Get a new power reading from the Tasmota device. Optionally include voltage (FIXME: not yet implemented)."""
         if include_voltage:
-            # FIXME: Not yet implemented
+            # FIXME: Not yet implemented # noqa: FIX001
             raise UnsupportedFeatureError("Voltage measurement is not yet implemented for Tasmota devices.")
 
         r = requests.get(
