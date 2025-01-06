@@ -39,14 +39,22 @@ def test_wizard(mock_config_factory) -> None:  # noqa: ANN001
     measure = _create_measure_instance(
         mock_config,
         console_events=event_factory(
-            key.ENTER,  # MEASURE_TYPE
-            "n",  # DUMMY_LOAD
-            "y",  # GENERATE_MODEL_JSON
-            key.DOWN,  # COLOR_MODE
-            key.DOWN,
+            # MEASURE_TYPE
             key.ENTER,
-            key.ENTER,  # GZIP
-            "n",  # MULTIPLE_LIGHTS
+            # GENERATE_MODEL_JSON
+            "y",
+            # DUMMY_LOAD
+            "n",
+            # MODEL_NAME
+            "a", key.ENTER,
+            # MEASURE_DEVICE
+            "a", key.ENTER,
+            # COLOR_MODE
+            key.DOWN, key.DOWN, key.ENTER,
+            # GZIP
+            key.ENTER,
+            # MULTIPLE_LIGHTS
+            "n",
         ),
     )
 
@@ -54,7 +62,7 @@ def test_wizard(mock_config_factory) -> None:  # noqa: ANN001
         measure.start()
 
     assert os.path.exists(os.path.join(PROJECT_DIR, "export/dummy/brightness.csv.gz"))
-    assert not os.path.exists(os.path.join(PROJECT_DIR, "export/dummy/model.json"))
+    assert os.path.exists(os.path.join(PROJECT_DIR, "export/dummy/model.json"))
 
 
 def test_run_light(mock_config_factory) -> None:  # noqa: ANN001
