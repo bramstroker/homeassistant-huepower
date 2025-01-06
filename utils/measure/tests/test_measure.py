@@ -46,11 +46,15 @@ def test_wizard(mock_config_factory) -> None:  # noqa: ANN001
             # DUMMY_LOAD
             "n",
             # MODEL_NAME
-            "a", key.ENTER,
+            "a",
+            key.ENTER,
             # MEASURE_DEVICE
-            "a", key.ENTER,
+            "a",
+            key.ENTER,
             # COLOR_MODE
-            key.DOWN, key.DOWN, key.ENTER,
+            key.DOWN,
+            key.DOWN,
+            key.ENTER,
             # GZIP
             key.ENTER,
             # MULTIPLE_LIGHTS
