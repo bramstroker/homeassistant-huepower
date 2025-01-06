@@ -239,7 +239,7 @@ class LightRunner(MeasurementRunner):
                     on=True,
                     bri=255,
                 )
-            time.sleep(2)  # Wait for the light to process
+            time.sleep(self.config.sleep_time)  # Wait for the light to process
 
     def get_variations(
         self,
