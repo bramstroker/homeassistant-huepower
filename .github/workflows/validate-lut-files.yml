@@ -6,8 +6,8 @@ on:
        - '**/*.csv.gz'
        - '.github/scripts/lut_validator/**'
 
-permissions:
-   pull-requests: write
+#permissions:
+#   pull-requests: write
 
 jobs:
   validate-lut:
@@ -71,11 +71,32 @@ jobs:
             echo "![Image](${url})" >> $GITHUB_OUTPUT
           done
           echo 'EOF' >> $GITHUB_OUTPUT
-      - name: Add comment to PR
-        uses: mshick/add-pr-comment@v2
+      - name: Post Comment on PR
+        uses: actions/github-script@v6
         with:
-          message: |
-            ${{ steps.build-pr-message.outputs.PR_MESSAGE }}
+          script: |
+            const octokit = require('@octokit/rest')({
+              auth: process.env.PAT_TOKEN
+            });
+
+            const { context } = require('@actions/github');
+
+            const prNumber = context.payload.pull_request.number;
+            const repo = context.repo;
+
+            await octokit.issues.createComment({
+              owner: repo.owner,
+              repo: repo.repo,
+              issue_number: prNumber,
+              body: "Thank you for your PR! We will review it soon."
+            });
+        env:
+          PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
+#      - name: Add comment to PR
+#        uses: mshick/add-pr-comment@v2
+#        with:
+#          message: |
+#            ${{ steps.build-pr-message.outputs.PR_MESSAGE }}
       - name: add label
         uses: actions-ecosystem/action-add-labels@v1
         with:
