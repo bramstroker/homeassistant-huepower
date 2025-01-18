@@ -4,8 +4,9 @@ import time
 from typing import Any
 
 import inquirer
-from homeassistant_api import Client
+from homeassistant_api import Client, Entity
 
+from measure.const import QUESTION_DUMMY_LOAD
 from measure.powermeter.const import QUESTION_POWERMETER_ENTITY_ID, QUESTION_VOLTAGEMETER_ENTITY_ID
 from measure.powermeter.errors import PowerMeterError, UnsupportedFeatureError
 from measure.powermeter.powermeter import PowerMeasurementResult, PowerMeter
@@ -16,6 +17,7 @@ class HassPowerMeter(PowerMeter):
         self._call_update_entity = call_update_entity
         self._entity_id: str | None = None
         self._voltage_entity_id: str | None = None
+        self._entities: list[Entity] | None = None
         try:
             self.client = Client(api_url, token, cache_session=False)
         except Exception as e:
@@ -74,40 +76,44 @@ class HassPowerMeter(PowerMeter):
         self._voltage_entity_id = matched_sensors.get(power_entity)
         return True
 
-    def get_voltage_question(self) -> list[inquirer.questions.Question]:
-        """Return a question to select a voltage sensor."""
-        voltage_sensor_list = self.get_voltage_sensors()
-
-        return [
-            inquirer.List(
-                name=QUESTION_VOLTAGEMETER_ENTITY_ID,
-                message="Select the voltage sensor",
-                choices=voltage_sensor_list,
-            ),
-        ]
-
     def get_questions(self) -> list[inquirer.questions.Question]:
-        power_sensor_list = self.get_power_sensors()
+        def _should_skip_voltage_sensor_question(answers: dict[str, Any]) -> bool:
+            """Determine if the voltage sensor question should be asked."""
+            if not answers.get(QUESTION_DUMMY_LOAD, False):
+                return True
+            return self.autodetect_voltage_entity(answers.get(QUESTION_POWERMETER_ENTITY_ID))
 
+        power_sensor_list = self.get_power_sensors()
         return [
             inquirer.List(
                 name=QUESTION_POWERMETER_ENTITY_ID,
                 message="Select the powermeter",
                 choices=power_sensor_list,
             ),
+            inquirer.List(
+                name=QUESTION_VOLTAGEMETER_ENTITY_ID,
+                message="Select the voltage sensor",
+                choices=lambda answers: self.get_voltage_sensors(),
+                ignore=_should_skip_voltage_sensor_question,
+            ),
         ]
 
     def get_power_sensors(self) -> list[str]:
-        entities = self.client.get_entities()
-        sensors = entities["sensor"].entities.values()
-        power_sensors = [entity.entity_id for entity in sensors if entity.state.attributes.get("unit_of_measurement") == "W"]
-        return sorted(power_sensors)
+        return self.get_entities_by_unit_of_measurement("W")
 
     def get_voltage_sensors(self) -> list[str]:
-        entities = self.client.get_entities()
-        sensors = entities["sensor"].entities.values()
-        voltage_sensors = [entity.entity_id for entity in sensors if entity.state.attributes.get("unit_of_measurement") == "V"]
-        return sorted(voltage_sensors)
+        return self.get_entities_by_unit_of_measurement("V")
+
+    def get_entities_by_unit_of_measurement(self, unit_of_measurement: str) -> list[str]:
+        return sorted(
+            [entity.entity_id for entity in self.get_entities() if entity.state.attributes.get("unit_of_measurement") == unit_of_measurement],
+        )
+
+    def get_entities(self) -> list[Entity]:
+        if not self._entities:
+            entities = self.client.get_entities()
+            self._entities = list(entities["sensor"].entities.values())
+        return self._entities
 
     def match_power_and_voltage_sensors(self) -> dict[str, str]:
         power_sensors = self.get_power_sensors()
@@ -124,7 +130,7 @@ class HassPowerMeter(PowerMeter):
 
         return matched_sensors
 
-    def process_answers(self, answers: dict[str, Any]) -> bool:
+    def process_answers(self, answers: dict[str, Any]) -> None:
         self._entity_id = answers[QUESTION_POWERMETER_ENTITY_ID]
         if QUESTION_VOLTAGEMETER_ENTITY_ID in answers:
             self._voltage_entity_id = answers[QUESTION_VOLTAGEMETER_ENTITY_ID]
