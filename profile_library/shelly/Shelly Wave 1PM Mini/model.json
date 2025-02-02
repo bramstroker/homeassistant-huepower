@@ -1,0 +1,21 @@
+{
+  "measure_description": "Manually measured with Gossen Metrawatt 29S (energy speciality DMM). The device has a quite poor power factor (~0.3) making the apparent power VA of this device with 0.35 VA and 0.65 VA quite a lot higher than the effective power.",
+  "measure_method": "manual",
+  "measure_device": "Gossen Metrawatt Metra Hit 29S",
+  "name": "Shelly Wave 1PM Mini",
+  "aliases": [
+    "QMSW-0A1P8"
+  ],
+  "discovery_by": "device",
+  "device_type": "smart_switch",
+  "only_self_usage": true,
+  "calculation_strategy": "fixed",
+  "standby_power": 0.129,
+  "standby_power_on": 0.168,
+  "sensor_config": {
+    "power_sensor_naming": "{} Device Power",
+    "energy_sensor_naming": "{} Device Energy"
+  },
+  "created_at": "2025-12-29T20:57:00",
+  "author": "Arne Schwabe <arne@rfc2549.org>"
+}
