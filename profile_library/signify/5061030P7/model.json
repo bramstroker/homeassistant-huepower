@@ -1,0 +1,17 @@
+{
+  "calculation_strategy": "lut",
+  "created_at": "2024-12-20T00:55:44.692662",
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "Shelly PM Mini Gen3",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 2,
+    "SLEEP_TIME": 2,
+    "VERSION": "master"
+  },
+  "aliases": [
+    "5061030P7_01"
+  ],
+  "name": "Hue Centris 2-Spot Ceiling Light",
+  "standby_power": 0.4
+}
